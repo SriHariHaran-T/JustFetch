@@ -4,6 +4,8 @@
 
 A lightweight Bash-based system information tool for Linux, built as my first shell scripting project.
 
+<p align=center><img width="807" height="294" alt="JustFetch" src="assets/JustFetchScreenShot.png"> </p>
+
 JustFetch displays useful information about your system directly in the terminal, with custom colours and a few fun command-line options.
 
 ## Features
