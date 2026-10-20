@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 RED_FC="31"
 BLUE_FC="34"
 WHITE_FC="37"
@@ -10,7 +12,7 @@ BOLDBLUE="\033[1;${BLUE_FC}m"
 FAINTBLUE="\033[2;${BLUE_FC}m"
 
 logo(){
-    ./logo "$1"
+    "$SCRIPT_DIR/logo" "$@"
 }
 
 show_logoconfig() {
@@ -36,7 +38,7 @@ source ~/.config/justfetch/config.txt
 }
 
 information(){
-source ./information
+source "$SCRIPT_DIR/information"
 }
 
 if [[ ! -f "$HOME/.config/justfetch/config.txt" ]]; then
@@ -46,7 +48,7 @@ else
 
 fi
 
-mapfile -t INFO < <(./information)
+mapfile -t INFO < <("$SCRIPT_DIR/information")
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -106,9 +108,9 @@ while [ "$#" -gt 0 ]; do
     done
 
 if [[ -n "$logopath" ]]; then
-    mapfile -t LOGO < <(./logo "$logopath")
+    mapfile -t LOGO < <("$SCRIPT_DIR/logo" "$logopath")
 else 
-    mapfile -t LOGO < <(./logo)
+    mapfile -t LOGO < <("$SCRIPT_DIR/logo")
 fi
 
 
