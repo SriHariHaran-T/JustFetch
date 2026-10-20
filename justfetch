@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+RED_FC="31"
+BLUE_FC="34"
+WHITE_FC="37"
+WHITE="\033[0;${WHITE_FC}m"
+BOLDWHITE="\033[1;${WHITE_FC}m"
+ENDCOLOR="\033[0m"
+BOLDBLUE="\033[1;${BLUE_FC}m"
+FAINTBLUE="\033[2;${BLUE_FC}m"
+
+logo(){
+    ./logo "$1"
+}
+
+show_logoconfig() {
+    printf '\n%b\n' "${BOLDBLUE}JUSTFETCH LOGO CONFIGURATION${ENDCOLOR}"
+
+    printf '\n%b\n' "${BOLDWHITE}Step 1: Create the configuration directory${ENDCOLOR}"
+    printf '%s\n' "mkdir -p ~/.config/justfetch"
+
+    printf '\n%b\n' "${BOLDWHITE}Step 2: Create the configuration file${ENDCOLOR}"
+    printf '%s\n' "touch ~/.config/justfetch/config.txt"
+
+    printf '\n%b\n' "${BOLDWHITE}Step 3: Use your path along with the logo flag${ENDCOLOR}"
+    printf '%s\n' "./justfetch -l /path/to/your/logo"
+
+    printf '\n%b\n' "${BOLDWHITE}Reset to the default logo${ENDCOLOR}"
+    printf '%s\n' "./justfetch --logo"
+
+    printf '\n%b\n' "${FAINTBLUE}Your custom logo will persist between runs.${ENDCOLOR}"
+}
+
+config(){
+source ~/.config/justfetch/config.txt 
+}
+
+information(){
+source ./information
+}
+
+if [[ ! -f "$HOME/.config/justfetch/config.txt" ]]; then
+    logopath=""
+else
+    logopath="$(cat "$HOME"/.config/justfetch/config.txt)"
+
+fi
+
+mapfile -t INFO < <(./information)
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+	-h | --help)
+	    echo -e "${BOLDBLUE}justfetch${ENDCOLOR}""   	"Show system information
+	    echo -e "${BOLDBLUE}--help${ENDCOLOR}""   	"Show help and stop
+	    echo -e "${BOLDBLUE}--version${ENDCOLOR}""   	"Show version and stop
+	    echo -e "${BOLDBLUE}--json${ENDCOLOR}""   	"Show JSON format and stop
+	    echo -e "${BOLDBLUE}--logoconfig${ENDCOLOR}""    "Steps to add your own logo
+	    echo -e "${BOLDBLUE}--logo [PATH]${ENDCOLOR}""    "Add your own logo
+	    echo -e "${BOLDBLUE}--follow${ENDCOLOR}""   	"Follow me in Instagram!
+	    shift
+	    exit 0
+	    ;;
+	-v | --version)
+	    echo -e "${BOLDBLUE}VERSION${ENDCOLOR}: 1.0 (INDEV)"
+	    shift
+	    exit 0
+	    ;;
+	-f | --follow)
+	    echo -e "${BOLDBLUE}FOLLOW ME${ENDCOLOR}: \033]8;;http://instagram.com/heodoestech/\033\\\\${FAINTBLUE}Instagram${ENDCOLOR}\033]8;;\033\\\\"
+	    shift
+	    exit 0
+	    ;;
+	-j | --json)
+	    printf '%bSystem Information: \n' "$BOLDBLUE" 
+	    information
+	    printf '\n%bJSON Output: \n' "$BOLDBLUE"
+
+	    printf '%b\n{\n"user": "%s", \n"os": "%s", \n"kernel": "%s", \n"cpu": "%s", \n"gpu": "%s", \n"cpucores": %d, \n"uptime": "%s", \n"ram": "%s" \n}' "$WHITE" "$CURRENT_USER" "$OS $MACH" "$KERNEL" "$CPU" "$GPU" "$CPUCORES" "$UPTIME" "$RAM"
+	    shift
+	    exit 0
+	    ;;
+
+	-lc | --logoconfig)
+	    show_logoconfig
+	    exit 0
+	    ;;
+
+	-l | --logo)
+	    shift
+	    
+	    if [[ -z "$1" || "$1" == -* ]]; then
+		logopath=""
+		: > "$HOME/.config/justfetch/config.txt"
+	    else
+		logopath="$1"
+		shift
+		printf '%s\n' "$logopath" > "$HOME/.config/justfetch/config.txt"
+	    fi
+	    ;;
+	*)
+	    echo "Unkown argument: $1 Use justfetch {--help} for more information"
+	    exit 1
+	    ;;
+	esac
+    done
+
+if [[ -n "$logopath" ]]; then
+    mapfile -t LOGO < <(./logo "$logopath")
+else 
+    mapfile -t LOGO < <(./logo)
+fi
+
+
+for i in "${!LOGO[@]}"; do
+    printf '%b %-30s %s\n' "$BOLDBLUE" "${LOGO[$i]}" "${INFO[$i]}"
+done 
+
+
+
+    
+

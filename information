@@ -1,0 +1,101 @@
+#! /usr/bin/env bash
+
+os(){
+source /etc/os-release
+echo "$PRETTY_NAME"
+}
+
+cpu(){
+grep -m 1 'model name' /proc/cpuinfo | cut -d: -f 2 | xargs
+}
+
+terminal(){
+TERMINAL="Unknown"
+if [[ "$TERM" == *kitty* ]]; then
+    TERMINAL="Kitty"
+elif [[ "$TERM" == *alacritty* ]]; then
+    TERMINAL="Alacritty"
+elif [[ "$TERM" == *tmux-256color* ]]; then
+    TERMINAL="Tmux"
+elif [[ "$TERM" == *linux* ]]; then
+    TERMINAL="TTY"
+fi
+
+echo "$TERMINAL"
+
+}
+
+gpu(){
+    check_lspci=$(command -v lspci)
+    if [[ -z "$check_lspci" ]]; then
+	check_lshw=$(command -v lshw)
+	if [[ -z "$check_lshw" ]]; then
+	   echo "Dependencies lspci and lshw not found"
+	else 
+	   find_lshw=$(lshw -C display | grep -m 1 'product' | cut -d: -f2)
+		if [[ -z "$find_lshw" ]]; then
+		   echo "GPU not found"
+	   else 
+		echo "$find_lshw"
+	   fi
+	fi
+    else 
+	   find_lspci=$(lspci | grep -Ei "VGA|3D|Display" | cut -d: -f3)
+		if [[ -z "$find_lspci" ]]; then
+		   echo "GPU not found"
+		else
+		   echo "$find_lspci"
+		fi
+	   fi
+}
+
+NODENAME="$(uname -n)"
+CURRENT_USER="$(whoami)"
+OS="$(os)"
+MACH="$(uname -m)"
+CPU="$(cpu)"
+CPUCORES="$(nproc)"
+KERNEL="$(uname -r)"
+UPTIME="$(uptime -p)"
+RAM="$(free -h | awk '/^Mem:/ {print $3"/"$2}')"
+HARDWARE="$( hostnamectl | awk '/^  Hardware Model:/ {print $3" "$4" "$5}')"
+GPU="$(gpu)"
+SHELL="$(ps -o comm= -p $PPID)"
+WM="$(wmctrl -m | awk '/^Name:/ {print $2}')"
+TERMINAL="$(terminal)"
+
+
+#DISK="$(df -h | awk '/^\/dev\/sdb3/ {print "("$3"/"$4")"" "$5}')"
+
+RED_FC="31"
+BLUE_FC="34"
+WHITE_FC="37"
+WHITE="\033[0;${WHITE_FC}m"
+BOLDWHITE="\033[1;${WHITE_FC}m"
+BOLDRED="\033[1;${RED_FC}m"
+ENDCOLOR="\033[0m"
+BOLDBLUE="\033[1;${BLUE_FC}m"
+FAINTBLUE="\033[2;${BLUE_FC}m"
+
+
+
+display="$(
+    printf '\n%b%s%b@%b%s\n' "$BOLDBLUE" "$CURRENT_USER" "$WHITE" "$BOLDBLUE" "$NODENAME"
+    printf '\n%bUSER %b: %s' "$BOLDBLUE" "$WHITE" "$CURRENT_USER"
+    printf '\n%bOS %b: %s' "$BOLDBLUE" "$WHITE" "$OS $MACH"
+    printf '\n%bHOST %b: %s' "$BOLDBLUE" "$WHITE" "$HARDWARE"
+    printf '\n%bKERNEL %b: %s' "$BOLDBLUE" "$WHITE" "$KERNEL"
+    printf '\n%bSHELL %b: %s' "$BOLDBLUE" "$WHITE" "$SHELL"
+    printf '\n%bTERMINAL %b: %s' "$BOLDBLUE" "$WHITE" "$TERMINAL"
+    printf '\n%bWM %b: %s' "$BOLDBLUE" "$WHITE" "$WM"
+    printf '\n%bCPU %b: %s' "$BOLDBLUE" "$WHITE" "$CPU"
+    printf '\n%bCPU CORES %b: %s' "$BOLDBLUE" "$WHITE" "$CPUCORES"
+    printf '\n%bGPU %b: %s' "$BOLDBLUE" "$WHITE" "$GPU"
+    printf '\n%bRAM %b: %s' "$BOLDBLUE" "$WHITE" "$RAM"
+    printf '\n%bUPTIME %b: %s' "$BOLDBLUE" "$WHITE" "$UPTIME")"
+
+mapfile -t INFORMATION <<< "$display"
+printf '%s\n' "${INFORMATION[@]}"
+
+
+

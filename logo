@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+logopath=${1:-"$dir/logos/ascii/Default.txt"}
+
+if [[ ! -f "$logopath" ]]; then 
+    echo "File doesn't exists use existing .png/.jpg files for better results!"
+    exit 1
+
+elif [[ "$logopath" == *.png ]]; then 
+    ascii-image-converter "$logopath" -b -d 40,20 > $dir/logos/ascii/userlogo.txt
+    mapfile -t ARCH < "$dir/logos/ascii/userlogo.txt"
+    printf '%s\n' "${ARCH[@]}"
+
+elif [[ "$logopath" == *.jpg ]]; then 
+    ascii-image-converter "$logopath" -b -d 40,20 > $dir/logos/ascii/userlogo.txt
+    mapfile -t ARCH < "$dir/logos/ascii/userlogo.txt"
+    printf '%s\n' "${ARCH[@]}"
+
+elif [[ "$logopath" == *.txt ]]; then
+    mapfile -t ARCH < "$logopath"
+    printf '%s\n' "${ARCH[@]}"
+
+elif [[ -f "$logopath" ]]; then
+    mapfile -t ARCH < "$logopath"
+    printf '%s\n' "${ARCH[@]}"
+
+else
+    echo "File format is not supported use existing .png/.jpg files for better results!"
+fi
