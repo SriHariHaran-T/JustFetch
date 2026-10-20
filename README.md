@@ -1,10 +1,10 @@
 <p align=center><img width="400" height="400" alt="JustFetch" src="assets/JustFetch.png"> </p>
 
-# <p align=center>justfetch
+# <p align=center>JustFetch
 
 A lightweight Bash-based system information tool for Linux, built as my first shell scripting project.
 
-justfetch displays useful information about your system directly in the terminal, with custom colours and a few fun command-line options.
+JustFetch displays useful information about your system directly in the terminal, with custom colours and a few fun command-line options.
 
 ## Features
 
@@ -21,7 +21,7 @@ justfetch displays useful information about your system directly in the terminal
 
 ## Usage
 
-Run justfetch from your terminal:
+Run JustFetch from your terminal:
 
 ```bash
 justfetch
@@ -62,16 +62,33 @@ Make the script executable:
 ```bash
 chmod +x justfetch logo information
 ```
+Create a symbolic link in `~/.local/bin` so you can run JustFetch from any directory:
 
+```bash
+mkdir -p ~/.local/bin
+```
+Check whether `~/.local/bin/justfetch` already exists before creating the link. If it does, inspect it before replacing it.
+
+Run the following commands from inside the cloned project directory:
+
+```bash 
+ln -s "$(realpath justfetch)" ~/.local/bin/justfetch
+```
+Ensure `~/.local/bin` is included in your PATH. If it isn't, add this line to your `~/.bashrc`:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+Reload your Bash configuration:
+
+```bash
+source ~/.bashrc
+```
 Run it:
 
 ```bash
-./justfetch
+justfetch
 ```
-
-To run justfetch from any directory, place the executable in a directory included in your `PATH`, such as `~/.local/bin`.
-
-**Note:** The logo implementation currently supports only Arch Linux. Support for additional Linux distributions will be added in the future!
 
 ## Why I built this
 
