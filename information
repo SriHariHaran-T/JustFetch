@@ -10,19 +10,48 @@ grep -m 1 'model name' /proc/cpuinfo | cut -d: -f 2 | xargs
 }
 
 terminal(){
-TERMINAL="Unknown"
-if [[ "$TERM" == *kitty* ]]; then
+if [[ -n "$KITTY_PID" ]]; then
     TERMINAL="Kitty"
-elif [[ "$TERM" == *alacritty* ]]; then
+elif [[ "$TERM_PROGRAM" == "WezTerm" ]]; then
+    TERMINAL="WezTerm"
+elif [[ "$TERM_PROGRAM" == "ghostty" || -n "$GHOSTTY_RESOURCES_DIR" ]]; then
+    TERMINAL="Ghostty"
+elif [[ "$TERM" == xterm-kitty ]]; then
+    TERMINAL="Kitty"
+elif [[ "$TERM" == alacritty* ]]; then
     TERMINAL="Alacritty"
-elif [[ "$TERM" == *tmux-256color* ]]; then
+elif [[ "$TERM" == foot* ]]; then
+    TERMINAL="foot"
+elif [[ "$TERM" == wezterm* ]]; then
+    TERMINAL="WezTerm"
+elif [[ "$TERM" == xterm-ghostty ]]; then
+    TERMINAL="Ghostty"
+elif [[ "$TERM" == tmux* ]]; then
     TERMINAL="Tmux"
-elif [[ "$TERM" == *linux* ]]; then
+elif [[ "$TERM" == screen* ]]; then
+    TERMINAL="Screen"
+elif [[ "$TERM" == linux ]]; then
     TERMINAL="TTY"
+elif [[ "$TERM" == xterm* ]]; then
+    TERMINAL="Xterm-compatible"
+elif [[ "$TERM" == *-256color ]]; then
+    TERMINAL="256-color terminal"
+else
+    TERMINAL="Unknown"
 fi
-
 echo "$TERMINAL"
 
+}
+
+wm() {
+    if ! command -v wmctrl &>/dev/null; then
+        WM="Unknown"
+    else
+        WM="$(wmctrl -m 2>/dev/null | awk -F': ' '/^Name:/ {print $2}')"
+        WM="${WM:-None}"
+    fi
+
+    printf '%s\n' "$WM"
 }
 
 gpu(){
@@ -61,7 +90,7 @@ RAM="$(free -h | awk '/^Mem:/ {print $3"/"$2}')"
 HARDWARE="$( hostnamectl | awk '/^  Hardware Model:/ {print $3" "$4" "$5}')"
 GPU="$(gpu)"
 SHELL="$(ps -o comm= -p $PPID)"
-WM="$(wmctrl -m | awk '/^Name:/ {print $2}')"
+WM="$(wm)"
 TERMINAL="$(terminal)"
 
 

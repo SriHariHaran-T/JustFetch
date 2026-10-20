@@ -42,16 +42,62 @@ Unsupported options display an error message.
 
 ## Requirements
 
-- Linux
-- Bash
-- `hostnamectl` (provided by systemd)
-- `[ascii-image-converter](https://github.com/TheZoraiz/ascii-image-converter)` (for converting images into ASCII logos)
-- Standard Linux utilities, including `uname`, `uptime`, `free`, `cut`, `lshw`, and `awk`
-- `pciutils` (for hardware information)
+### System Requirements
+
+- **Operating System:** Linux
+- **Shell:** Bash
+- **System information:** `hostnamectl` (provided by systemd)
+- **Standard utilities:** `uname`, `uptime`, `free`, `cut`, `awk`, and `lshw`
+- **Hardware information:** `pciutils` (provides `lspci`)
+
+### Optional Dependencies
+
+- **[ascii-image-converter](https://github.com/TheZoraiz/ascii-image-converter):** Required for converting custom images into ASCII logos.
+
+### Installing Dependencies
+
+Install the required packages using your distribution's package manager.
+
+#### Arch Linux / Manjaro / EndeavourOS
+
+```bash
+sudo pacman -S bash systemd util-linux procps-ng coreutils gawk lshw pciutils
+```
+#### Debian / Ubuntu-based distributions
+
+```bash
+sudo apt update
+sudo apt install bash systemd util-linux procps coreutils gawk lshw pciutils
+```
+#### Fedora
+
+```bash
+sudo dnf install bash systemd util-linux procps-ng coreutils gawk lshw pciutils
+```
+#### openSUSE
+
+```bash
+sudo zypper install bash systemd util-linux procps coreutils gawk lshw pciutils
+```
+### Installing ascii-image-converter
+
+Follow the official installation instructions for your system:
+- [Official installation guide](https://github.com/TheZoraiz/ascii-image-converter#installation)
+- [Arch User Repository (AUR)](https://aur.archlinux.org/packages/ascii-image-converter-git)
+- [Homebrew installation](https://github.com/TheZoraiz/ascii-image-converter)
+
+#### Verify the installation with:
+
+```bash
+ascii-image-converter -h
+```
+<sub>Note: Package names may vary between distributions. hostnamectl requires systemd, and custom logo conversion requires ascii-image-converter to be installed and available in your PATH.</sub>
+
 
 ## Installation
 
 Clone this repository:
+
 ```bash
 git clone https://github.com/SriHariHaran-T/justfetch 
 cd justfetch
