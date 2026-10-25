@@ -50,6 +50,7 @@ fi
 
 mapfile -t INFO < <("$SCRIPT_DIR/information")
 
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
 	-h | --help)
@@ -117,7 +118,6 @@ fi
 for i in "${!LOGO[@]}"; do
     printf '%b %-30s %s\n' "$BOLDBLUE" "${LOGO[$i]}" "${INFO[$i]}"
 done 
-
 
 
     

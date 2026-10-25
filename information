@@ -43,6 +43,26 @@ echo "$TERMINAL"
 
 }
 
+printcolors(){
+    local colors
+
+    colors=$(seq 0 7)
+
+    for color in $colors; do
+        printf '\033[48;5;%sm   \033[0m' "$color"
+    done
+
+    printf '\n'
+
+    colors=$(seq 8 15)
+
+    for color in $colors; do
+        printf '\033[48;5;%sm   \033[0m' "$color"
+    done
+
+    printf '\n'
+}
+
 wm() {
     if ! command -v wmctrl &>/dev/null; then
         WM="Unknown"
@@ -92,7 +112,7 @@ GPU="$(gpu)"
 SHELL="$(ps -o comm= -p $PPID)"
 WM="$(wm)"
 TERMINAL="$(terminal)"
-
+COLORS="$(printcolors)"
 
 #DISK="$(df -h | awk '/^\/dev\/sdb3/ {print "("$3"/"$4")"" "$5}')"
 
@@ -121,7 +141,8 @@ display="$(
     printf '\n%bCPU CORES %b: %s' "$BOLDBLUE" "$WHITE" "$CPUCORES"
     printf '\n%bGPU %b: %s' "$BOLDBLUE" "$WHITE" "$GPU"
     printf '\n%bRAM %b: %s' "$BOLDBLUE" "$WHITE" "$RAM"
-    printf '\n%bUPTIME %b: %s' "$BOLDBLUE" "$WHITE" "$UPTIME")"
+    printf '\n%bUPTIME %b: %s' "$BOLDBLUE" "$WHITE" "$UPTIME"
+    printf '\n\n%s' "$COLORS")"
 
 mapfile -t INFORMATION <<< "$display"
 printf '%s\n' "${INFORMATION[@]}"
