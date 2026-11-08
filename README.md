@@ -38,6 +38,7 @@ justfetch
 | `--json` | Display JSON output along with System Information for verifications |
 | `--logoconfig` | Steps to add your own logo |
 | `--logo` | Add your own logo |
+| `--image` | Add your image to be displayed pixelated |
 | `--follow` | Display my Instagram link |
 
 Unsupported options display an error message.
@@ -52,9 +53,11 @@ Unsupported options display an error message.
 - **Standard utilities:** `uname`, `uptime`, `free`, `cut`, `awk`, and `lshw`
 - **Hardware information:** `pciutils` (provides `lspci`)
 
-### Optional Dependencies
+### Dependencies
 
 - **[ascii-image-converter](https://github.com/TheZoraiz/ascii-image-converter):** Required for converting custom images into ASCII logos.
+- **[chafa](https://github.com/hpjansson/chafa):** Required for converting custom images into Pixelated logos.
+
 
 ### Installing Dependencies
 
@@ -93,7 +96,11 @@ Follow the official installation instructions for your system:
 ```bash
 ascii-image-converter -h
 ```
-<sub>Note: Package names may vary between distributions. hostnamectl requires systemd, and custom logo conversion requires ascii-image-converter to be installed and available in your PATH.</sub>
+### Installing chafa
+- [Official installation guide](https://github.com/hpjansson/chafa#installing)
+
+
+<sub>Note: Package names may vary between distributions. hostnamectl requires systemd, and custom logo conversion requires ascii-image-converter and chafa to be installed and available in your PATH.</sub>
 
 
 ## Installation
@@ -115,13 +122,8 @@ Create a symbolic link in `~/.local/bin` so you can run JustFetch from any direc
 ```bash
 mkdir -p ~/.local/bin
 ```
-Check whether `~/.local/bin/justfetch` already exists before creating the link. If it does, inspect it before replacing it.
+Copy the all the files from justfetch folder into your `~/.local/bin`
 
-Run the following commands from inside the cloned project directory:
-
-```bash 
-ln -s "$(realpath justfetch)" ~/.local/bin/justfetch
-```
 Ensure `~/.local/bin` is included in your PATH. If it isn't, add this line to your `~/.bashrc`:
 
 ```bash

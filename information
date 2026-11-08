@@ -89,7 +89,18 @@ gpu(){
 	   fi
 	fi
     else 
-	   find_lspci=$(lspci | grep -Ei "VGA|3D|Display" | cut -d: -f3)
+	   find_lspci=$(lspci -vmm | awk -F '\t' '
+/^Class:/ {
+    gpu = ($2 ~ /VGA compatible controller|3D controller|Display controller/)
+}
+/^Vendor:/ && gpu { vendor = $2 }
+/^Device:/ && gpu { device = $2 }
+/^$/ {
+    if (gpu)
+        print vendor, device
+    gpu = 0
+    vendor = device = ""
+}')
 		if [[ -z "$find_lspci" ]]; then
 		   echo "GPU not found"
 		else
@@ -116,36 +127,24 @@ COLORS="$(printcolors)"
 
 #DISK="$(df -h | awk '/^\/dev\/sdb3/ {print "("$3"/"$4")"" "$5}')"
 
-RED_FC="31"
-BLUE_FC="34"
-WHITE_FC="37"
-WHITE="\033[0;${WHITE_FC}m"
-BOLDWHITE="\033[1;${WHITE_FC}m"
-BOLDRED="\033[1;${RED_FC}m"
-ENDCOLOR="\033[0m"
-BOLDBLUE="\033[1;${BLUE_FC}m"
-FAINTBLUE="\033[2;${BLUE_FC}m"
-
-
-
 display="$(
-    printf '\n%b%s%b@%b%s\n' "$BOLDBLUE" "$CURRENT_USER" "$WHITE" "$BOLDBLUE" "$NODENAME"
-    printf '\n%bUSER %b: %s' "$BOLDBLUE" "$WHITE" "$CURRENT_USER"
-    printf '\n%bOS %b: %s' "$BOLDBLUE" "$WHITE" "$OS $MACH"
-    printf '\n%bHOST %b: %s' "$BOLDBLUE" "$WHITE" "$HARDWARE"
-    printf '\n%bKERNEL %b: %s' "$BOLDBLUE" "$WHITE" "$KERNEL"
-    printf '\n%bSHELL %b: %s' "$BOLDBLUE" "$WHITE" "$SHELL"
-    printf '\n%bTERMINAL %b: %s' "$BOLDBLUE" "$WHITE" "$TERMINAL"
-    printf '\n%bWM %b: %s' "$BOLDBLUE" "$WHITE" "$WM"
-    printf '\n%bCPU %b: %s' "$BOLDBLUE" "$WHITE" "$CPU"
-    printf '\n%bCPU CORES %b: %s' "$BOLDBLUE" "$WHITE" "$CPUCORES"
-    printf '\n%bGPU %b: %s' "$BOLDBLUE" "$WHITE" "$GPU"
-    printf '\n%bRAM %b: %s' "$BOLDBLUE" "$WHITE" "$RAM"
-    printf '\n%bUPTIME %b: %s' "$BOLDBLUE" "$WHITE" "$UPTIME"
-    printf '\n\n%s' "$COLORS")"
-
-mapfile -t INFORMATION <<< "$display"
-printf '%s\n' "${INFORMATION[@]}"
+    printf '\n%s@%s\n' "$CURRENT_USER" "$NODENAME"
+    printf '\nUSER       : %s' "$CURRENT_USER"
+    printf '\nOS         : %s' "$OS $MACH"
+    printf '\nHOST       : %s' "$HARDWARE"
+    printf '\nKERNEL     : %s' "$KERNEL"
+    printf '\nSHELL      : %s' "$SHELL"
+    printf '\nTERMINAL   : %s' "$TERMINAL"
+    printf '\nWM         : %s' "$WM"
+    printf '\nCPU        : %s' "$CPU"
+    printf '\nCPU CORES  : %s' "$CPUCORES"
+    printf '\nGPU        : %s' "$GPU"
+    printf '\nRAM        : %s' "$RAM"
+    printf '\nUPTIME     : %s' "$UPTIME"
+    printf '\n\n%s' "$COLORS"
+)"
+    mapfile -t INFORMATION <<< "$display"
+    printf '%s\n' "${INFORMATION[@]}"
 
 
 
