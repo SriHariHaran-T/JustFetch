@@ -11,8 +11,14 @@ ENDCOLOR="\033[0m"
 BOLDBLUE="\033[1;${BLUE_FC}m"
 FAINTBLUE="\033[2;${BLUE_FC}m"
 
+logo_type="image"
+
 logo(){
     "$SCRIPT_DIR/logo" "$@"
+}
+
+image(){
+    "$SCRIPT_DIR/image" "$@"
 }
 
 show_logoconfig() {
@@ -25,21 +31,33 @@ show_logoconfig() {
     printf '%s\n' "touch ~/.config/justfetch/config.txt"
 
     printf '\n%b\n' "${BOLDWHITE}Step 3: Use your path along with the logo flag${ENDCOLOR}"
-    printf '%s\n' "./justfetch -l /path/to/your/logo"
+    printf '%s\n' "./justfetch -l /path/to/your/logo (or) ./justfetch -i /path/to/your/image"
 
     printf '\n%b\n' "${BOLDWHITE}Reset to the default logo${ENDCOLOR}"
     printf '%s\n' "./justfetch --logo"
+    printf '%s\n' "./justfetch --image"
 
-    printf '\n%b\n' "${FAINTBLUE}Your custom logo will persist between runs.${ENDCOLOR}"
+
+    printf '\n%b\n' "${FAINTBLUE}Your custom logo/pixelated image will persist between runs.${ENDCOLOR}"
 }
 
 config(){
 source ~/.config/justfetch/config.txt 
 }
 
+mode(){
+source ~/.config/justfetch/mode.txt
+}
+
 information(){
 source "$SCRIPT_DIR/information"
 }
+
+if [[ ! -f "$HOME/.config/justfetch/image_path.txt" ]]; then
+    imagepath=""
+else
+    imagepath="$(cat "$HOME"/.config/justfetch/image_path.txt)"
+fi
 
 if [[ ! -f "$HOME/.config/justfetch/config.txt" ]]; then
     logopath=""
@@ -60,6 +78,7 @@ while [ "$#" -gt 0 ]; do
 	    echo -e "${BOLDBLUE}--json${ENDCOLOR}""   	"Show JSON format and stop
 	    echo -e "${BOLDBLUE}--logoconfig${ENDCOLOR}""    "Steps to add your own logo
 	    echo -e "${BOLDBLUE}--logo [PATH]${ENDCOLOR}""    "Add your own logo
+	    echo -e "${BOLDBLUE}--image [PATH]${ENDCOLOR}""    "Add your own pixelated image
 	    echo -e "${BOLDBLUE}--follow${ENDCOLOR}""   	"Follow me in Instagram!
 	    shift
 	    exit 0
@@ -88,6 +107,19 @@ while [ "$#" -gt 0 ]; do
 	    show_logoconfig
 	    exit 0
 	    ;;
+	   
+	-i | --image)
+	    shift
+		
+	    if [[ -z "$1" || "$1" == -* ]]; then
+		imagepath=""
+		: > "$HOME/.config/justfetch/image_path.txt"
+	    else
+		imagepath="$1"
+		shift
+		printf '%s\n' "$imagepath" > "$HOME/.config/justfetch/image_path.txt"
+	    fi
+	    ;;
 
 	-l | --logo)
 	    shift
@@ -108,17 +140,20 @@ while [ "$#" -gt 0 ]; do
 	esac
     done
 
-if [[ -n "$logopath" ]]; then
-    mapfile -t LOGO < <("$SCRIPT_DIR/logo" "$logopath")
-else 
-    mapfile -t LOGO < <("$SCRIPT_DIR/logo")
+if [[ "$logo_type" == "ascii" ]]; then
+    if [[ -n "$logopath" ]]; then
+	mapfile -t LOGO < <("$SCRIPT_DIR/logo" "$logopath")
+    else 
+	mapfile -t LOGO < <("$SCRIPT_DIR/logo")
+    fi
+elif [[ "$logo_type" == "image" ]]; then
+    if [[ -n "$imagepath" ]]; then
+	mapfile -t LOGO < <("$SCRIPT_DIR/image" "$imagepath")
+    else 
+	mapfile -t LOGO < <("$SCRIPT_DIR/image")
+    fi
 fi
 
-
 for i in "${!LOGO[@]}"; do
-    printf '%b %-30s %s\n' "$BOLDBLUE" "${LOGO[$i]}" "${INFO[$i]}"
-done 
-
-
-    
-
+    printf '%b%-42s  %s\n' "$BOLDBLUE" "${LOGO[$i]}" "${INFO[$i]}"
+done
